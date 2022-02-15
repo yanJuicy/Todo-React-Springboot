@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -80,6 +81,29 @@ public class TodoController {
 		ResponseDTO<TodoDto> response = ResponseDTO.<TodoDto>builder().data(dtos).build();
 
 		// 4 ResponseDto를 리턴
+		return ResponseEntity.ok().body(response);
+	}
+
+	@PutMapping
+	public ResponseEntity<?> updateTodo(@RequestBody TodoDto dto) {
+		String temporaryUserId = "temporary-user";
+
+		// 1 dto를 entity로 변환
+		TodoEntity entity = TodoDto.toEntity(dto);
+
+		// 2 id를 temporaryUserId로 초기화
+		entity.setUserId(temporaryUserId);
+
+		// 3 서비스를 이용해 entity를 업데이트
+		List<TodoEntity> entities = service.update(entity);
+
+		// 4 자바 스트릠을 이용해 리턴된 엔터ㅣ 리스트를 TodoDto 리스트로 변환
+		List<TodoDto> dtos = entities.stream().map(TodoDto::new).collect(Collectors.toList());
+
+		// 5 변환된 TodoDto 리스트를 이용해 ResponseDto를 초기화
+		ResponseDTO<TodoDto> response = ResponseDTO.<TodoDto>builder().data(dtos).build();
+
+		// 6 ResponseDto를 리턴
 		return ResponseEntity.ok().body(response);
 	}
 
