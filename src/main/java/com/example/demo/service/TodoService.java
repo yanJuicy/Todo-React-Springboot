@@ -78,4 +78,23 @@ public class TodoService {
 		return retrieve(entity.getUserId());
 	}
 
+	public List<TodoEntity> delete(final TodoEntity entity) {
+		// 엔터티 유효 호가인
+		validate(entity);
+
+		try {
+			// 엔터티 삭제
+			repository.delete(entity);
+		} catch (Exception e) {
+			// exception 발생 시 id와 excpetion을 로깅
+			log.error("error deleteing entity", entity.getId(), e);
+
+			// 컨트롤러로 excpetion을 보낸다 DB 내부 로직을 캡슐화하려면 e를 리턴하지 않고 새 excpetio 오브젝트 리턴
+			throw new RuntimeException("error deleting entity " + entity.getId());
+		}
+
+		// 새 Todo 리스트를 가져와 리턴
+		return retrieve(entity.getUserId());
+	}
+
 }
