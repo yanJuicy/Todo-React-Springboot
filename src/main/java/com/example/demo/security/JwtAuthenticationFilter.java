@@ -41,13 +41,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				log.info("Authenticated user Id : " + userId);
 				
 				// 인증 완료. SecurityContextHolder에 등록해야 인증된 사용자라고 생각
-				AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+				AbstractAuthenticationToken authentication = 
+					new UsernamePasswordAuthenticationToken(
 						userId,	// 인증된 사용자 정보. 문자열이 아니어도 아무것이나 넣을 수 있다. 보통 UserDetails의 오브젝트를 넣는다.
 						null,	
 						AuthorityUtils.NO_AUTHORITIES
 						);
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+				securityContext.setAuthentication(authentication);
 				SecurityContextHolder.setContext(securityContext);
 			}
 			
@@ -62,8 +64,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		// Http 요청의 헤더를 파싱해 Bearer 토큰 리턴
 		String bearerToken = request.getHeader("Authorization");
 		
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer "))
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
 			return bearerToken.substring(7);
+		}
 		return null;
 	}
 
